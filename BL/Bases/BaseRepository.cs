@@ -117,7 +117,7 @@ namespace BL.Bases
 
         public virtual void Update(T entity)
         {
-            EntityEntry<T> dbEntityEntry = DbContext.Entry(entity);
+            EntityEntry<T> dbEntityEntry = DbContext.Entry(entity);          
             dbEntityEntry.State = EntityState.Modified;
         }
 

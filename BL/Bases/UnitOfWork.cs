@@ -14,7 +14,7 @@ namespace BL.Bases
     public class UnitOfWork : IUnitOfWork
     {
 
-        private DbContext U_DbContext { get; set; }
+        private DbContext AS_DbContext { get; set; }
         private UserManager<ApplicationUsersIdentity> _userManager;
         private RoleManager<IdentityRole> _roleManager;
 
@@ -24,27 +24,62 @@ namespace BL.Bases
             get
             {
                 if (Account == null)
-                    Account = new AccountRepository(U_DbContext, _userManager, _roleManager);
+                    Account = new AccountRepository(AS_DbContext, _userManager, _roleManager);
                 return Account;
             }
         }
+        public RoleRepository Role;
+        public RoleRepository role
+        {
+            get
+            {
+                if (Role == null)
+                    Role = new RoleRepository(AS_DbContext, _roleManager);
+                return Role;
+            }
+        }
 
-        public UnitOfWork(ApplicationDBContext U_DbContext, UserManager<ApplicationUsersIdentity> userManager, RoleManager<IdentityRole> roleManager)
+        public SettingRepository Setting;
+        public SettingRepository setting
+        {
+            get
+            {
+                if (Setting == null)
+                    Setting = new SettingRepository(AS_DbContext);
+                return Setting;
+            }
+        }
+
+
+
+        public DailyLogsRepository DailyLogsRepository;
+        public DailyLogsRepository dailyLogsRepository
+        {
+            get
+            {
+                if (DailyLogsRepository == null)
+                    DailyLogsRepository = new DailyLogsRepository(AS_DbContext);
+                return DailyLogsRepository;
+            }
+        }
+
+        public UnitOfWork(ApplicationDBContext AS_DbContext, UserManager<ApplicationUsersIdentity> userManager, RoleManager<IdentityRole> roleManager)
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
-            this.U_DbContext = U_DbContext;//
+            this.AS_DbContext = AS_DbContext;
         }
 
         public int Commit()
         {
-            return U_DbContext.SaveChanges();
+            return AS_DbContext.SaveChanges();
         }
 
         public void Dispose()
         {
-            U_DbContext.Dispose();
+            AS_DbContext.Dispose();
         }
-   
+
+       
     }
 }

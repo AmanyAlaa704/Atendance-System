@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="MyStyle.css" />
+
+    <script>
+        $(document).ready(function () {
+            console.log(localStorage.getItem("role"))
+            if (localStorage.getItem("role") != null) {
+                if (localStorage.getItem("role").toString() == "Admin") {
+                    document.getElementById("AdminView").style.display = "block";
+                    document.getElementById("EmpView").style.display = "block";
+                }
+                else if (localStorage.getItem("role").toString() == "Employee") {
+                    document.getElementById("AdminView").style.display = "none";
+                    document.getElementById("EmpView").style.display = "block";
+                }
+            }
+
+        });
+    </script>
+
+    <h1>Hello  ....</h1>
+    <button id="SignOutBtn" name="SignOutBtn" type="submit" class="button2">SignOut</button>
+
+    <script>
+        var UserId = localStorage.getItem("UserData")
+        if (UserId != null) {
+
+            $('#SignOutBtn').click(function () {
+                fetch('https://localhost:44326/Logout/' + UserId,
+                    {
+                        method: 'POST',
+                        mode: 'cors',
+                        cache: 'no-cache',
+                        credentials: 'same-origin',
+
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then((localStorage.removeItem("UserData"), localStorage.removeItem("token"), localStorage.removeItem("role"))
+                        (window.location.href = "../wwwroot/Login.html")
+                    )
+
+                    .catch(function (erro) {
+                        console.log(erro);
+                    });
+            });
+        }
+    </script>
+
+    <div id="AdminView" style="display:none">
+        <p style="font-weight: bold">Employees</p>
+        <a href="attendancereport.html">attendance report</a>
+        <select id="Employees" name="Employees">
+            <option value="0"> Select Employee</option>
+        </select>
+
+
+
+        <table id="employeesTable" name="employeesTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date  and Time</th>
+                    <th>Login or Out</th>
+                </tr>
+            <tbody id="employeesTableAdd" name="employeesTableAdd"></tbody>
+
+        </table>
+        <h1 id="h1CountArriveLate"></h1>
+        <h1 id="h1CountLeaveEarly"></h1>
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                
+                $.ajax({
+                    url: 'https://localhost:44326/api/Account/UsersInRole/Employee',
+                    method: 'GET',
+                    success: function (data) {
+                        console.log(data)
+                        $.each(data, function (index, value) {
+                            $('#Employees').append(
+                                "<option value=" + value.id + ">" +
+                                value.userName +
+                                "</option>"
+                            );
+                        });
+                    },
+                });
+            });
+            $('select').on('change', function () {
+
+                $('#employeesTableAdd').remove()
+                document.getElementById("h1CountArriveLate").innerHTML = ""
+                document.getElementById("h1CountLeaveEarly").innerHTML = ""
+                g = document.createElement('tbody');
+                g.setAttribute("id", "employeesTableAdd");
+                $('#employeesTable').append(g)
+                
+                localStorage.setItem("SelectedUserId", this.value);
+                $.ajax({
+                    url: 'https://localhost:44326/GetUserLogs/' + localStorage.getItem("SelectedUserId").toString(),
+                    method: 'GET',
+                    success: function (data) {
+                        console.log(localStorage.getItem("SelectedUserId").toString())
+                        CountLate(localStorage.getItem("SelectedUserId").toString())
+                        CountearlyLeave(localStorage.getItem("SelectedUserId").toString())
+
+                        $.each(data, function (index, value) {
+                            console.log(value)
+                            $('#employeesTableAdd').append(
+                                "<tr><td>" + (index + 1) + "</td><td>" +
+                                value.dateTime.toString()
+                                + "</td><td>" + value.logInOrOut + "</td>" +
+                                "</tr>"
+                            );
+
+                        });
+                    },
+                });
+
+
+            });
+
+            function CountLate(userId) {
+                $.ajax({
+                    url: 'https://localhost:44326/CountLate/' + userId,
+                    method: 'GET',
+                    success: function (data) {
+                        console.log(data)
+                        document.getElementById("h1CountArriveLate").innerHTML = "Late To Arrive " + data.toString() + " Times"
+
+                    }
+                });
+
+            }
+            function CountearlyLeave(userId) {
+                $.ajax({
+                    url: 'https://localhost:44326/CountEarly/' + userId,
+                    method: 'GET',
+                    success: function (data) {
+                        console.log(data)
+                        document.getElementById("h1CountLeaveEarly").innerHTML = "Early To Leave " + data.toString() + " Times"
+
+
+                    }
+                });
+            }            
+        </script>
+    </div>
+
+</body>
+</html>

@@ -68,10 +68,10 @@ namespace BL.Repositories
             return result;
 
         }
-        public async Task<ApplicationUsersIdentity> Find(string username, string password)
+        public async Task<ApplicationUsersIdentity> Find(string Email, string password)
         {
 
-            var user = await manager.FindByNameAsync(username);
+            var user = await manager.FindByEmailAsync(Email);
             if (user != null && await manager.CheckPasswordAsync(user, password))
             {
                 return user;
@@ -93,15 +93,31 @@ namespace BL.Repositories
             var user = await manager.FindByIdAsync(userid);
             if (user != null && await roleManager.RoleExistsAsync(rolename))
             {
-                IdentityResult result = await manager.AddToRoleAsync(user, rolename);
+                IdentityResult result = await manager.AddToRoleAsync(user, rolename);                
                 return result;
             }
             return null;
         }
+        public async Task<List<ApplicationUsersIdentity>> UsersInRole(string rolename)
+        {
+            var users = await manager.GetUsersInRoleAsync(rolename);
+            return (List<ApplicationUsersIdentity>)users;
+
+        }
+
+
+        public async Task<string> getRoleName(string UserID)
+        {
+            var user = await manager.FindByIdAsync(UserID);
+            var roles = await manager.GetRolesAsync(user);
+
+            return  roles.FirstOrDefault();          
+        }
+
         public async Task<bool> updatePassword(string stid, RegisterDto accountInfo, string oldPassword)
         {
             ApplicationUsersIdentity user = GetFirstOrDefault(l => l.Id == stid);
-            var newPasswordHash = manager.PasswordHasher.HashPassword(user, accountInfo.Password);
+            var newPasswordHash = manager.PasswordHasher.HashPassword(user, accountInfo.PasswordHash);
 
             if (await manager.CheckPasswordAsync(user, oldPassword))
             {
@@ -127,6 +143,8 @@ namespace BL.Repositories
         {
             return GetAny(std => std.UserName == user.UserName && std.Email == user.Email);
         }
+
+        
     }
 }
 

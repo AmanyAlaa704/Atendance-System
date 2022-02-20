@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DAL.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -43,6 +44,9 @@ namespace DAL
         }
 
         public DbSet<EmployeeLogs> DailyLogs { get; set; }
+        public DbSet<Setting> settings { get; set; }
+
+
     }
 
 }

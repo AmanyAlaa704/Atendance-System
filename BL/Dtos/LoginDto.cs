@@ -8,10 +8,14 @@ using System.Threading.Tasks;
 namespace BL.Dtos
 {
     public class LoginDto
-    {              
-        public string UserName { get; set; }
-  
+    {
+        public string Id { get; set; }
+
+        [Required]
+        public string Email { get; set; }
+
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        [Required]
+        public string PasswordHash { get; set; }
     }
 }

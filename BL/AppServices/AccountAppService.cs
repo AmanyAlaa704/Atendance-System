@@ -4,6 +4,7 @@ using BL.Dtos;
 using BL.Interfaces;
 using BL.StaticClasses;
 using DAL;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -20,6 +21,8 @@ namespace BL.AppServices
     public class AccountAppService : AppServiceBase
     {
         IConfiguration _configuration;
+        IHttpContextAccessor _httpContextAccessor;
+
 
         public AccountAppService(IUnitOfWork theUnitOfWork, IConfiguration configuration,
              IMapper mapper) : base(theUnitOfWork, mapper)
@@ -39,17 +42,15 @@ namespace BL.AppServices
             return Mapper.Map<RegisterDto>(TheUnitOfWork.account.GetAccountById(id));
 
         }
-
-       
-        public async Task<ApplicationUsersIdentity> Find(string name, string password)
+        public async Task<ApplicationUsersIdentity> Find(string Email, string password)
         {
-            ApplicationUsersIdentity user = await TheUnitOfWork.account.Find(name, password);
+            ApplicationUsersIdentity user = await TheUnitOfWork.account.Find(Email, password);
 
-            if (user != null )
+            if (user != null)
                 return user;
             return null;
         }
-    
+
         public async Task<ApplicationUsersIdentity> FindByName(string userName)
         {
             ApplicationUsersIdentity user = await TheUnitOfWork.account.FindByName(userName);
@@ -58,6 +59,7 @@ namespace BL.AppServices
                 return user;
             return null;
         }
+
         public async Task<IdentityResult> Register(RegisterDto user)
         {
             bool isExist = await checkUserNameExist(user.UserName);
@@ -72,12 +74,14 @@ namespace BL.AppServices
             }
             return result;
         }
+
         public async Task<IdentityResult> AssignToRole(string userid, string rolename)
         {
             if (userid == null || rolename == null)
                 return null;
             return await TheUnitOfWork.account.AssignToRole(userid, rolename);
         }
+
         public async Task<bool> UpdatePassword(string userID, RegisterDto accountInfo, string oldPassword)
         {
             return await TheUnitOfWork.account.updatePassword(userID, accountInfo, oldPassword);
@@ -85,7 +89,7 @@ namespace BL.AppServices
         }
 
         public async Task<bool> Update(RegisterDto user)
-        { 
+        {
             ApplicationUsersIdentity identityUser = await TheUnitOfWork.account.FindById(user.Id);
             var oldPassword = identityUser.PasswordHash;
             Mapper.Map(user, identityUser);
@@ -93,15 +97,23 @@ namespace BL.AppServices
             return await TheUnitOfWork.account.UpdateAccount(identityUser);
 
         }
+
         public async Task<bool> checkUserNameExist(string userName)
         {
             var user = await TheUnitOfWork.account.FindByName(userName);
             return user == null ? false : true;
         }
+
         public async Task<IEnumerable<string>> GetUserRoles(ApplicationUsersIdentity user)
         {
             return await TheUnitOfWork.account.GetUserRoles(user);
         }
+        public async Task<List<ApplicationUsersIdentity>> UsersInRole(string rolename)
+        {
+            return await TheUnitOfWork.account.UsersInRole(rolename);
+
+        }
+
         public async Task<dynamic> CreateToken(ApplicationUsersIdentity user)
         {
             var userRoles = await GetUserRoles(user);
@@ -138,13 +150,19 @@ namespace BL.AppServices
 
         }
 
+        public string getUserID()
+        {
+
+            return _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        }
         public async Task CreateFirstAdmin()
         {
             var firstAdmin = new RegisterDto()
             {
-                Id = null,                
-                UserName = UserRoles.Admin,
-                Password = "@Admin12345",
+                Id = null,
+                UserName = "Admin",
+                Email = "Admin@gmail.com",
+                PasswordHash = "@Admin12345",
 
             };
             Register(firstAdmin).Wait();
@@ -164,6 +182,12 @@ namespace BL.AppServices
             {
                 return TheUnitOfWork.account.CheckAccountExistsByData(std);
             }
+        }
+
+
+        public async Task<string> getRoleName(string UserID)
+        {
+            return await TheUnitOfWork.account.getRoleName(UserID);
         }
     }
 }

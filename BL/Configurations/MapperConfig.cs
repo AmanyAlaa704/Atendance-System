@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BL.Dtos;
 using DAL;
+using DAL.Models;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace BL.Configurations
             CreateMap<ApplicationUsersIdentity, RegisterDto>().ReverseMap();
             CreateMap<IdentityRole, RoleDto>().ReverseMap();
             CreateMap<EmployeeLogs, EmployeeLogsDto>().ReverseMap();
+            CreateMap<Setting, SettingDto>().ReverseMap();
 
         }
     }

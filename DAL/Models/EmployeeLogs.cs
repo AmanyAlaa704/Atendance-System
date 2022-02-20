@@ -16,7 +16,7 @@ namespace DAL
         public string LogInOrOut { get; set; }
 
         [ForeignKey("UserID")]
-        public ApplicationIdentity applicationIdentity { get; set; }
+        public ApplicationUsersIdentity applicationIdentity { get; set; }
 
     }
 }

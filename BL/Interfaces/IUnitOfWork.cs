@@ -11,6 +11,10 @@ namespace BL.Interfaces
     {
         int Commit();
         AccountRepository account { get; }
+        RoleRepository role { get; }
+
+        DailyLogsRepository dailyLogsRepository { get; }
+         SettingRepository setting { get; }
 
     }
 }

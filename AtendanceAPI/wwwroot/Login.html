@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>    
+    <link rel="stylesheet" href="MyStyle.css" />
+</head>
+<body>
+
+    <h2>Modal Login Form</h2>
+    <div class="modal-content animate">
+
+        <div class="container">
+            <label for="Email"><b>Email</b></label>
+            <input type="email" placeholder="Enter Username" name="email" id="email" required>
+
+            <label for="PasswordHash"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="passwordHash" id="passwordHash" required>
+            <button type="submit" id="LoginBtn" name="LoginBtn">Login</button>
+
+            <div>
+                Create New Account?<a href="SignUp.html">Register</a>
+            </div>
+
+            <div id="SomethingWrongHappen" style="display:none">
+                <p style="background-color:palevioletred"> Somethoing wrong happen try again</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script type="text/javascript">      
+        $('#LoginBtn').click(function () {
+            console.log($('#email').val() + "   " + $('#passwordHash').val())
+            const data = {
+
+                email: $('#email').val(),
+                passwordHash: $('#passwordHash').val()
+            };
+            fetch('https://localhost:44326/Login',
+                {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data =>
+                (localStorage.setItem("token", data.token.token),localStorage.setItem("role", data.roleName), localStorage.setItem("UserData", data.user))
+                    (window.location.href = "../wwwroot/Home.html")
+                )
+                .catch(function (erro) {
+                    document.getElementById("SomethingWrongHappen").style.display="block"
+            });
+        });
+    </script>
+
+</body>
+    
+</html>

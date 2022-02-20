@@ -11,12 +11,12 @@ namespace BL.Dtos
     {
         public string Id { get; set; }
         public string UserName { get; set; }
+        public string Email { get; set; }
 
+        [Display(Name = "Password")]
+        public string PasswordHash { get; set; }
 
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        [Compare("Password")]
+        [Compare("PasswordHash")]
         public string ConfirmPassword { get; set; }        
         public string RoleName { get; set; }
 

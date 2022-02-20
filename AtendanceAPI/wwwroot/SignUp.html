@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="MyStyle.css" />
+
+</head>
+<body>
+
+    <h2>Modal SignUp Form</h2>
+    <div class="modal-content animate">
+
+        <div class="container">
+            <label for="Email"><b>User Name</b></label>
+            <input type="email" placeholder="Enter Username" name="userName" id="userName" required>
+
+            <label for="Email"><b>Email</b></label>
+            <input type="email" placeholder="Enter Email" name="email" id="email" required>
+
+            <label for="PasswordHash"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="passwordHash" id="passwordHash" required>
+
+            <label for="confirmPassword"><b>Confirm Password</b></label>
+            <input type="password" placeholder="Confirm Password" name="confirmPassword" id="confirmPassword" required>
+
+            <div id="Employee">
+
+                <button type="submit" id="SignUpBtn" name="SignUpBtn">SignUp</button>
+
+                <div>
+                    Do you have account?<a href="Login.html">SignIn</a>
+                </div>
+
+            </div>
+            <div id="Admin" style="display:none">
+                <button type="submit" id="SignAdminUpBtn" name="SignAdminUpBtn">SignUp</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+   <script>
+       $(document).ready(function () {
+           if (localStorage.getItem("role") != null) {
+               if (localStorage.getItem("role").toString() == "Admin") {
+                   document.getElementById("Admin").style.display = "block";
+                   document.getElementById("Employee").style.display = "none";
+               }
+           }
+         
+       });
+      
+   </script>
+    <!--Employee-->
+
+    <script type="text/javascript">
+        $('#SignUpBtn').click(function () {
+            console.log($('#email').val() + "   " + $('#passwordHash').val())
+            const data = {
+                UserName: $("#userName").val(),
+                email: $('#email').val(),
+                passwordHash: $('#passwordHash').val(),
+                confirmPassword: $('#confirmPassword').val(),
+                roleName: "Employee"
+            };
+            fetch('https://localhost:44326/RegisterEmp',
+                {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json().then(window.location.href = "../wwwroot/Login.html"))
+                .catch(function (erro) {
+                    console.log(erro);
+                });
+        });
+
+
+    </script>
+
+    <!--Admin-->
+    <script type="text/javascript">
+
+        $('#SignAdminUpBtn').click(function () {
+            console.log($('#email').val() + "   " + $('#passwordHash').val())
+            const data = {
+                userName: $("#userName").val(),
+                email: $('#email').val(),
+                passwordHash: $('#passwordHash').val(),
+                confirmPassword: $('#confirmPassword').val(),
+                roleName: "Admin"
+            };
+            fetch('https://localhost:44326/RegisterAdmin',
+                {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(console.log(data))
+                .then(
+                    window.location.href = "../wwwroot/Login.html")
+                .catch(function (erro) {
+                    console.log(erro);
+                });
+        });
+
+
+    </script>
+
+
+</body>
+</html>
